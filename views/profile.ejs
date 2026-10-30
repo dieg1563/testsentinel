@@ -1,0 +1,46 @@
+<%- include('layout', { title: 'Profile & Settings', user }) %>
+
+<div class="row mb-3">
+  <div class="col">
+    <h5 class="fw-bold mb-0">Profile &amp; Settings</h5>
+    <p class="text-muted small">Update your personal information and preferences</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Personal information</div>
+      <div class="card-body">
+        <form method="POST" action="/profile">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Username</label>
+            <input type="text" class="form-control" value="<%= user.username %>" disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email</label>
+            <input type="text" class="form-control" value="<%= user.email %>" disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Display name</label>
+            <input type="text" name="display_name" class="form-control" placeholder="Leave blank to use username" value="<%= user.display_name || '' %>">
+            <div class="form-text">This name is shown in the navigation bar.</div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Appearance</label>
+            <select name="theme" class="form-select">
+              <option value="light" <%= user.theme !== 'dark' ? 'selected' : '' %>>Light</option>
+              <option value="dark" <%= user.theme === 'dark' ? 'selected' : '' %>>Dark</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

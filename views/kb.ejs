@@ -1,0 +1,32 @@
+<%- include('layout', { title: 'Knowledge Base', user }) %>
+
+<div class="row mb-3">
+  <div class="col">
+    <h5 class="fw-bold mb-0">Knowledge Base</h5>
+    <p class="text-muted small">Self-service articles and procedures</p>
+  </div>
+</div>
+
+<div class="row g-3">
+  <% for (const file of files) { %>
+  <div class="col-md-6 col-lg-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body d-flex align-items-start gap-3">
+        <span class="fs-4">&#128196;</span>
+        <div>
+          <h6 class="mb-1"><a href="/kb/view?doc=<%= file %>" class="text-decoration-none"><%= file.replace('.html', '').replace(/-/g, ' ') %></a></h6>
+          <p class="text-muted small mb-0"><%= file %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+  <% if (files.length === 0) { %>
+  <div class="col"><p class="text-muted">No articles available.</p></div>
+  <% } %>
+</div>
+
+  </div>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

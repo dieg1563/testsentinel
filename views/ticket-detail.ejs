@@ -1,0 +1,66 @@
+<%- include('layout', { title: ticket.title, user }) %>
+
+<div class="row">
+  <div class="col-lg-8">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/tickets">Tickets</a></li>
+        <li class="breadcrumb-item active">#<%= ticket.id %></li>
+      </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white d-flex align-items-center gap-2">
+        <span class="badge badge-<%= ticket.priority %>"><%= ticket.priority %></span>
+        <span class="badge bg-secondary"><%= ticket.status %></span>
+        <span class="text-muted small ms-auto">#<%= ticket.id %></span>
+      </div>
+      <div class="card-body">
+        <h5 class="fw-bold mb-3"><%= ticket.title %></h5>
+        <p class="text-muted"><%= ticket.description || 'No description.' %></p>
+        <hr>
+        <div class="row text-muted small">
+          <div class="col-sm-6">Created by: <strong><%= ticket.creator_name || '-' %></strong></div>
+          <div class="col-sm-6">Assigned to: <strong><%= ticket.assignee_name || 'Unassigned' %></strong></div>
+          <div class="col-sm-6 mt-1">Created: <%= ticket.created_at ? ticket.created_at.slice(0, 10) : '-' %></div>
+          <div class="col-sm-6 mt-1"><a href="/tickets/<%= ticket.id %>/export" class="text-decoration-none small">Export as text</a></div>
+        </div>
+      </div>
+    </div>
+
+    <h6 class="fw-bold mb-3">Comments (<%= comments.length %>)</h6>
+
+    <% for (const comment of comments) { %>
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <strong class="small"><%= comment.author_name %></strong>
+          <span class="text-muted small"><%= comment.created_at ? comment.created_at.slice(0, 16).replace('T', ' ') : '' %></span>
+        </div>
+        <div class="comment-content"><%- comment.content %></div>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (comments.length === 0) { %>
+    <p class="text-muted small">No comments on this ticket.</p>
+    <% } %>
+
+    <div class="card border-0 shadow-sm mt-4">
+      <div class="card-header bg-white fw-semibold small">Add a comment</div>
+      <div class="card-body">
+        <form method="POST" action="/tickets/<%= ticket.id %>/comment">
+          <div class="mb-3">
+            <textarea name="content" class="form-control" rows="3" placeholder="Your comment..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Post</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

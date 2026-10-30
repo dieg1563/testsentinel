@@ -1,0 +1,76 @@
+<%- include('layout', { title: 'Dashboard', user }) %>
+
+<div class="row mb-4">
+  <div class="col">
+    <h5 class="fw-bold">Dashboard</h5>
+    <p class="text-muted small">TechCo helpdesk overview</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-center border-0 shadow-sm">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-primary"><%= stats.total %></div>
+        <div class="text-muted small mt-1">Total tickets</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-center border-0 shadow-sm">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-success"><%= stats.open %></div>
+        <div class="text-muted small mt-1">Open</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-center border-0 shadow-sm">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-warning"><%= stats.inProgress %></div>
+        <div class="text-muted small mt-1">In progress</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-center border-0 shadow-sm">
+      <div class="card-body">
+        <div class="display-6 fw-bold text-danger"><%= stats.urgent %></div>
+        <div class="text-muted small mt-1">Urgent</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white fw-semibold">Recent tickets</div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th class="ps-3">#</th>
+          <th>Title</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Created by</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const t of recent) { %>
+        <tr>
+          <td class="ps-3 text-muted small"><%= t.id %></td>
+          <td><a href="/tickets/<%= t.id %>" class="text-decoration-none"><%= t.title %></a></td>
+          <td><span class="badge badge-<%= t.priority %>"><%= t.priority %></span></td>
+          <td><span class="badge bg-secondary"><%= t.status %></span></td>
+          <td class="text-muted small"><%= t.creator_name %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </div>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

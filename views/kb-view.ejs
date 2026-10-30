@@ -1,0 +1,19 @@
+<%- include('layout', { title: doc, user }) %>
+
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/kb">Knowledge Base</a></li>
+    <li class="breadcrumb-item active"><%= doc %></li>
+  </ol>
+</nav>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body kb-content">
+    <%- content %>
+  </div>
+</div>
+
+  </div>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

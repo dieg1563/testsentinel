@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= typeof title !== 'undefined' ? title : 'SupportDesk' %> | SupportDesk</title>
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+  <style>
+    .badge-urgent { background-color: #dc3545; }
+    .badge-high { background-color: #fd7e14; }
+    .badge-medium { background-color: #0d6efd; }
+    .badge-low { background-color: #6c757d; }
+  </style>
+</head>
+<body data-bs-theme="<%= typeof user !== 'undefined' && user && user.theme ? user.theme : 'light' %>">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/dashboard">
+        <span class="text-warning">&#9679;</span> SupportDesk
+      </a>
+      <% if (typeof user !== 'undefined' && user) { %>
+      <div class="navbar-nav ms-auto flex-row align-items-center gap-3">
+        <a class="nav-link text-light" href="/tickets">Tickets</a>
+        <a class="nav-link text-light" href="/kb">Knowledge Base</a>
+        <div class="dropdown">
+          <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <%- user.display_name || user.username %>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/profile">Profile &amp; Settings</a></li>
+            <li><a class="dropdown-item" href="/tickets?view=mine">My Tickets</a></li>
+            <% if (user.role === 'admin') { %><li><a class="dropdown-item" href="/admin">Admin Panel</a></li><% } %>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/logout">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </nav>
+  <div class="container mt-4">
