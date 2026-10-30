@@ -1,0 +1,22 @@
+# Prometheus -- configuration de scrape pour SentinelX / SupportDesk
+# La cible "supportdesk" restera DOWN tant que A n'a pas exposé /metrics : c'est normal.
+# Vérifier l'état des cibles : http://localhost:9090/targets
+
+global:
+  scrape_interval: 15s        # fréquence de collecte par défaut
+  evaluation_interval: 15s    # fréquence d'évaluation des règles
+
+scrape_configs:
+  # Métriques de l'application instrumentée (travail de A)
+  - job_name: "supportdesk"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supportdesk:3000"]   # nom du service dans docker-compose + port interne
+        labels:
+          app: "supportdesk"
+          team: "sentinelx"
+
+  # Prometheus se surveille lui-même (utile pour vérifier que tout tourne)
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

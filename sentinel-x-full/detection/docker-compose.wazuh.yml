@@ -1,0 +1,83 @@
+# detection/docker-compose.wazuh.yml : overlay Wazuh single-node (partie B)
+#
+# ATTENTION : 8-12 Go de RAM, 5-15 min au premier démarrage.
+# À combiner avec le compose principal :
+#   docker compose -f docker-compose.yml -f detection/docker-compose.wazuh.yml up -d
+#
+# Ce fichier est un SQUELETTE basé sur le single-node officiel :
+#   https://github.com/wazuh/wazuh-docker  (branche v4.9.0, dossier single-node)
+# Étapes côté B avant le premier démarrage :
+#   1. Cloner wazuh-docker, générer les certificats :
+#        docker compose -f generate-indexer-certs.yml run --rm generator
+#   2. Copier le dossier config/ (certs + confs) à côté de ce fichier.
+#   3. Renseigner les mots de passe (INDEXER_PASSWORD, API_PASSWORD).
+#
+# Points de raccord SentinelX déjà câblés ci-dessous :
+#   - réseau "sentinel" partagé avec l'app
+#   - volume app_logs monté en lecture seule dans le manager
+#   - règles et décodeurs custom montés dans le manager
+
+services:
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.0
+    container_name: wazuh.manager
+    hostname: wazuh.manager
+    restart: unless-stopped
+    networks:
+      - sentinel
+    ports:
+      - "1514:1514"
+      - "1515:1515"
+      - "55000:55000"
+    environment:
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${INDEXER_PASSWORD:-SecretPassword}
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+    volumes:
+      # --- raccords SentinelX ---
+      - app_logs:/var/log/supportdesk:ro
+      - ./detection/rules/local_rules.xml:/var/ossec/etc/rules/local_rules.xml
+      - ./detection/decoders/local_decoder.xml:/var/ossec/etc/decoders/local_decoder.xml
+      # NB : ajouter le bloc <localfile> de detection/ossec-localfile.conf dans ossec.conf
+      #      (via un ossec.conf monté, ou wazuh-modules). Voir detection/README-detection.md
+      # --- persistance (depuis le single-node officiel) ---
+      - wazuh_etc:/var/ossec/etc
+      - wazuh_logs:/var/ossec/logs
+
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.0
+    container_name: wazuh.indexer
+    hostname: wazuh.indexer
+    restart: unless-stopped
+    networks:
+      - sentinel
+    ports:
+      - "9200:9200"
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+    volumes:
+      - wazuh_indexer_data:/var/lib/wazuh-indexer
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.0
+    container_name: wazuh.dashboard
+    hostname: wazuh.dashboard
+    restart: unless-stopped
+    networks:
+      - sentinel
+    ports:
+      - "8443:5601"
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${INDEXER_PASSWORD:-SecretPassword}
+      - WAZUH_API_URL=https://wazuh.manager
+    depends_on:
+      - wazuh.indexer
+
+volumes:
+  wazuh_etc:
+  wazuh_logs:
+  wazuh_indexer_data:

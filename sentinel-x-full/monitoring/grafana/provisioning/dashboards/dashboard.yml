@@ -1,0 +1,17 @@
+# Grafana -- provider de dashboards.
+# Charge tous les .json du dossier au démarrage pour que le dashboard
+# SentinelX soit versionné dans Git et présent dès le premier lancement.
+
+apiVersion: 1
+
+providers:
+  - name: "SentinelX"
+    orgId: 1
+    folder: "SentinelX"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

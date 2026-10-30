@@ -1,0 +1,75 @@
+# SentinelX : stack complète (app + monitoring + détection)
+# Repo complet. Build de l'app depuis ./app, configs monitoring depuis ./monitoring.
+#
+# Wazuh est fourni séparément dans detection/docker-compose.wazuh.yml
+# (indexer + manager + dashboard, 8-12 Go de RAM). On le combine avec :
+#   docker compose -f docker-compose.yml -f detection/docker-compose.wazuh.yml up -d
+#
+# Stack légère (app + Prometheus + Grafana seulement) :
+#   docker compose up -d --build
+
+services:
+  supportdesk:
+    build: ./app
+    container_name: supportdesk
+    ports:
+      - "3000:3000"
+    environment:
+      - SESSION_SECRET=${SESSION_SECRET:-dev-secret-change-in-prod}
+      - PORT=3000
+      - LOG_FILE=/var/log/supportdesk/app.json
+    volumes:
+      - app_logs:/var/log/supportdesk
+    networks:
+      - sentinel
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/metrics"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+    networks:
+      - sentinel
+    restart: unless-stopped
+    depends_on:
+      - supportdesk
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - sentinel
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+networks:
+  sentinel:
+    driver: bridge
+
+volumes:
+  app_logs:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,16 @@
+<!--
+  local_decoder.xml : décodeurs custom SentinelX
+
+  Le décodeur JSON natif de Wazuh (json_detect) parse déjà automatiquement
+  chaque ligne JSON et expose les champs sous le préfixe "data." :
+    data.event_type, data.source_ip, data.endpoint, data.status_code, etc.
+
+  On n'a donc PAS besoin de décodeur regex pour lire le JSON.
+  Ce fichier sert uniquement à nommer notre source pour des règles plus lisibles
+  et à documenter le mapping. Monté dans :
+    /var/ossec/etc/decoders/local_decoder.xml
+-->
+
+<decoder name="supportdesk-json">
+  <prematch>"event_type":"</prematch>
+</decoder>
